@@ -11,6 +11,7 @@ let imageFaceDown;
 let imagesFaceUp;
 
 let imagesDeck = [];
+let numFlipped = 0;
 
 // Tile Object
 // --------------------------
@@ -23,17 +24,26 @@ let Tile = function(x, y, face) {
 
 Tile.prototype.drawFaceDown = function() {
   fill(93, 81, 124);
-  strokeWeight(0);
+  stroke(255, 255, 255);
+  strokeWeight(4);
   rect(this.x, this.y, this.width, this.width, 10);
   image(imageFaceDown, this.x + 25, this.y + 25, 20, 20);
+  this.isFaceUp = false;
 }
 
 Tile.prototype.drawFaceUp = function() {
-  fill(93, 81, 124);
-  strokeWeight(0);
+  fill(223, 222, 239);
+  stroke(255, 255, 255);
+  strokeWeight(4);
   rect(this.x, this.y, this.width, this.width, 10);
   image(this.face, this.x, this.y, this.width, this.width);
-};
+  this.isFaceUp = true;
+}
+
+Tile.prototype.isUnderMouse = function(x, y) {
+  return x >= this.x && x <= this.x + this.width  &&
+    y >= this.y && y <= this.y + this.width;
+}
 
 // Game functions
 // --------------------------
@@ -48,7 +58,10 @@ function createTiles() {
 
 function drawTiles() {
   for (let i = 0; i < tiles.length; i++) {
-    tiles[i].drawFaceUp();
+    // Only draw the tile in each frame if it is not face up
+    if (!tiles[i].isFaceUp) {
+      tiles[i].drawFaceDown();
+    }
   }
 }
 
@@ -92,4 +105,15 @@ function setup() {
 
 function draw() {
   drawTiles();
+}
+
+function mouseClicked() {
+  for (let i = 0; i < tiles.length; i++) {
+    if (tiles[i].isUnderMouse(mouseX, mouseY)) {
+      if (numFlipped < 2 && !tiles[i].isFaceUp) {
+        tiles[i].drawFaceUp();
+        numFlipped++;
+      }
+    }
+  }
 }
