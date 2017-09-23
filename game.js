@@ -14,6 +14,8 @@ let imagesDeck = [];
 let flippedTiles = [];
 let delayStartFC = null;
 
+let numTries = 0;
+
 // Tile Object
 // --------------------------
 let Tile = function(x, y, face) {
@@ -105,6 +107,19 @@ function createimagesDeck(images) {
   })
 }
 
+function drawScoringMessage() {
+  let foundAllMatches = true;
+
+  for (let i = 0; i < tiles.length; i++) {
+    foundAllMatches = foundAllMatches && tiles[i].isMatch;
+  }
+
+  if (foundAllMatches) {
+    fill(0, 0, 0);
+    text("You found them all in " + numTries + " tries", 20, 360);
+  }
+}
+
 // p5.js functions
 // --------------------------
 function setup() {
@@ -129,6 +144,7 @@ function mouseClicked() {
         tiles[i].drawFaceUp();
         flippedTiles.push(tiles[i]);
         if (flippedTiles.length === 2) {
+          numTries++;
           if (flippedTiles[0].face === flippedTiles[1].face) {
             flippedTiles[0].isMatch = true;
             flippedTiles[1].isMatch = true;
@@ -139,4 +155,6 @@ function mouseClicked() {
       }
     }
   }
+
+  drawScoringMessage();
 }
