@@ -11,7 +11,8 @@ let imageFaceDown;
 let imagesFaceUp;
 
 let imagesDeck = [];
-let numFlipped = 0;
+let flippedTiles = [];
+let delayStartFC = null;
 
 // Tile Object
 // --------------------------
@@ -56,12 +57,25 @@ function createTiles() {
   }
 }
 
-function drawTiles() {
+function drawInitialFaceDown() {
   for (let i = 0; i < tiles.length; i++) {
     // Only draw the tile in each frame if it is not face up
     if (!tiles[i].isFaceUp) {
       tiles[i].drawFaceDown();
     }
+  }
+}
+
+function drawFaceDownIfNotMatched() {
+  if (delayStartFC && (frameCount - delayStartFC) > 60) {
+    for (let i = 0; i < tiles.length; i++) {
+      if (!tiles[i].isMatch) {
+        tiles[i].drawFaceDown();
+      }
+    }
+    flippedTiles = [];
+    delayStartFC = null;
+    noLoop();
   }
 }
 
@@ -104,15 +118,24 @@ function setup() {
 }
 
 function draw() {
-  drawTiles();
+  drawInitialFaceDown();
+  drawFaceDownIfNotMatched();
 }
 
 function mouseClicked() {
   for (let i = 0; i < tiles.length; i++) {
     if (tiles[i].isUnderMouse(mouseX, mouseY)) {
-      if (numFlipped < 2 && !tiles[i].isFaceUp) {
+      if (flippedTiles.length < 2 && !tiles[i].isFaceUp) {
         tiles[i].drawFaceUp();
-        numFlipped++;
+        flippedTiles.push(tiles[i]);
+        if (flippedTiles.length === 2) {
+          if (flippedTiles[0].face === flippedTiles[1].face) {
+            flippedTiles[0].isMatch = true;
+            flippedTiles[1].isMatch = true;
+          }
+          delayStartFC = frameCount;
+          loop();
+        }
       }
     }
   }
