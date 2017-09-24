@@ -4,7 +4,7 @@
 // --------------------------
 let tiles = [];
 
-const numRows = 4;
+const numRows = 3;
 const numColumns = 4;
 
 let imageFaceDown;
@@ -22,7 +22,8 @@ let Tile = function(x, y, face) {
   this.x = x;
   this.y = y;
   this.face = face;
-  this.width = 70;
+  this.width = 250;
+  this.isFaceUp = false;
 }
 
 Tile.prototype.drawFaceDown = function() {
