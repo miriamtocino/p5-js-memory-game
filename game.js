@@ -1,20 +1,20 @@
-'use strict';
+'use strict'
 
 // Game variables
 // --------------------------
-let tiles = [];
+let tiles = []
 
-const numRows = 3;
-const numColumns = 4;
+const numRows = 3
+const numColumns = 4
 
-let faceDownImage;
-let faceUpImages;
+let faceDownImage
+let faceUpImages
 
-let imagesDeck = [];
-let flippedTiles = [];
-let delayStartFC = null;
+let imagesDeck = []
+let flippedTiles = []
+let delayStartFC = null
 
-let numTries = 0;
+let numTries = 0
 
 // Tile Object
 // --------------------------
@@ -35,7 +35,6 @@ class Tile {
     rect(this.x, this.y, this.width, this.width, 20)
 
     if (this.isFaceUp === true) {
-      // image(this.faceUpImage, this.x + 40, this.y + 40, 20, 20)
       image(this.faceUpImage, this.x, this.y, this.width, this.width)
     } else {
       image(this.faceDownImage, this.x + 40, this.y + 40, 20, 20)
@@ -43,9 +42,7 @@ class Tile {
   }
 
   setIsFaceUp(isFaceUp) {
-    console.log(frameCount, "Changing value of isFaceUp, current value is: ", this.isFaceUp)
     this.isFaceUp = isFaceUp
-    console.log(frameCount, "Changing value of isFaceUp, new value is: ", this.isFaceUp)
   }
 
   isUnderMouse(x, y) {
@@ -57,33 +54,32 @@ class Tile {
 // Game functions
 // --------------------------
 function createTiles() {
-  // Assign an image from the imagesDeck array to each tile
-  for (let i = 0; i < numColumns; i++) {
-    for (let j = 0; j < numRows; j++) {
-      tiles.push(new Tile(i * 280 + 40, j * 280 + 40, imagesDeck.pop()));
+  for (let i = 0 i < numColumns i++) {
+    for (let j = 0 j < numRows j++) {
+      tiles.push(new Tile(i * 280 + 40, j * 280 + 40, imagesDeck.pop()))
     }
   }
 }
 
 function createShadows() {
-  for (let i = 0; i < numColumns; i++) {
-    for (let j = 0; j < numRows; j++) {
-      strokeWeight(0);
-      fill(209, 211, 212);
-      rect(i * 280 + 30, j * 280 + 50, 250, 250, 20);
+  for (let i = 0 i < numColumns i++) {
+    for (let j = 0 j < numRows j++) {
+      strokeWeight(0)
+      fill(209, 211, 212)
+      rect(i * 280 + 30, j * 280 + 50, 250, 250, 20)
     }
   }
 }
 
-function updateLogic() {
+function updateGameLogic() {
   if (delayStartFC && (frameCount - delayStartFC) > 30) {
-    for (let i = 0; i < tiles.length; i++) {
+    for (let i = 0 i < tiles.length i++) {
       if (!tiles[i].isMatch && tiles[i].isFaceUp) {
         tiles[i].setIsFaceUp(false)
       }
     }
-    flippedTiles = [];
-    delayStartFC = null;
+    flippedTiles = []
+    delayStartFC = null
   }
 }
 
@@ -95,74 +91,71 @@ function loadFaceUpImages() {
     loadImage("assets/surrender.png"),
     loadImage("assets/ted.png"),
     loadImage("assets/adele.png"),
-  ];
+  ]
 }
 
 function createImagesDeck(images) {
-  // Push 2 copies onto imagesDeck array
-  for (let i = 0; i < faceUpImages.length; i++) {
-    imagesDeck.push(images[i]);
-    imagesDeck.push(images[i]);
+  for (let i = 0 i < faceUpImages.length i++) {
+    imagesDeck.push(images[i])
+    imagesDeck.push(images[i])
   }
 
-  // Randomize imagesDeck array
   imagesDeck.sort(function() {
-    return 0.5 - random();
+    return 0.5 - random()
   })
 }
 
 function drawScoringMessage() {
-  let foundAllMatches = true;
+  let foundAllMatches = true
 
-  for (let i = 0; i < tiles.length; i++) {
-    foundAllMatches = foundAllMatches && tiles[i].isMatch;
+  for (let i = 0 i < tiles.length i++) {
+    foundAllMatches = foundAllMatches && tiles[i].isMatch
   }
 
   if (foundAllMatches) {
-    fill(0, 0, 0);
-    text("You found them all in " + numTries + " tries", 20, 360);
+    fill(0, 0, 0)
+    text("You found them all in " + numTries + " tries", 20, 360)
   }
 }
 
 // p5.js functions
 // --------------------------
 function setup() {
-  createCanvas(1352, 1352);
+  createCanvas(1352, 1352)
 
-  faceDownImage = loadImage("../assets/faceDownImage.png");
-  loadFaceUpImages();
+  faceDownImage = loadImage("../assets/faceDownImage.png")
+  loadFaceUpImages()
 
-  createImagesDeck(faceUpImages);
-  createShadows();
-  createTiles();
+  createImagesDeck(faceUpImages)
+  createShadows()
+  createTiles()
 }
 
 function draw() {
-  updateLogic()
+  updateGameLogic()
 
-  for (let i = 0; i < tiles.length; i++) {
+  for (let i = 0 i < tiles.length i++) {
     tiles[i].render()
   }
+
+  drawScoringMessage()
 }
 
 function mouseClicked() {
-  for (let i = 0; i < tiles.length; i++) {
+  for (let i = 0 i < tiles.length i++) {
     if (tiles[i].isUnderMouse(mouseX, mouseY)) {
       if (flippedTiles.length < 2 && !tiles[i].isFaceUp) {
         tiles[i].setIsFaceUp(true)
-        flippedTiles.push(tiles[i]);
+        flippedTiles.push(tiles[i])
         if (flippedTiles.length === 2) {
-          numTries++;
+          numTries++
           if (flippedTiles[0].faceUpImage === flippedTiles[1].faceUpImage) {
-            flippedTiles[0].isMatch = true;
-            flippedTiles[1].isMatch = true;
+            flippedTiles[0].isMatch = true
+            flippedTiles[1].isMatch = true
           }
-          delayStartFC = frameCount;
-          loop();
+          delayStartFC = frameCount
         }
       }
     }
   }
-
-  drawScoringMessage();
 }
