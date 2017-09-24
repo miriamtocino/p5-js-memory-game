@@ -7,8 +7,8 @@ let tiles = [];
 const numRows = 3;
 const numColumns = 4;
 
-let imageFaceDown;
-let imagesFaceUp;
+let faceDownImage;
+let faceUpImages;
 
 let imagesDeck = [];
 let flippedTiles = [];
@@ -18,35 +18,40 @@ let numTries = 0;
 
 // Tile Object
 // --------------------------
-let Tile = function(x, y, face) {
-  this.x = x;
-  this.y = y;
-  this.face = face;
-  this.width = 250;
-  this.isFaceUp = false;
-}
+class Tile {
+  constructor(x, y, faceUpImage) {
+    this.x = x
+    this.y = y
+    this.width = 250
+    this.faceDownImage = faceDownImage
+    this.faceUpImage = faceUpImage
+    this.isFaceUp = false
+  }
 
-Tile.prototype.drawFaceDown = function() {
-  fill(93, 81, 124);
-  stroke(255, 255, 255);
-  strokeWeight(4);
-  rect(this.x, this.y, this.width, this.width, 10);
-  image(imageFaceDown, this.x + 25, this.y + 25, 20, 20);
-  this.isFaceUp = false;
-}
+  render() {
+    fill(93, 81, 124)
+    stroke(255, 255, 255)
+    strokeWeight(4)
+    rect(this.x, this.y, this.width, this.width, 20)
 
-Tile.prototype.drawFaceUp = function() {
-  fill(223, 222, 239);
-  stroke(255, 255, 255);
-  strokeWeight(4);
-  rect(this.x, this.y, this.width, this.width, 10);
-  image(this.face, this.x, this.y, this.width, this.width);
-  this.isFaceUp = true;
-}
+    if (this.isFaceUp === true) {
+      // image(this.faceUpImage, this.x + 40, this.y + 40, 20, 20)
+      image(this.faceUpImage, this.x, this.y, this.width, this.width)
+    } else {
+      image(this.faceDownImage, this.x + 40, this.y + 40, 20, 20)
+    }
+  }
 
-Tile.prototype.isUnderMouse = function(x, y) {
-  return x >= this.x && x <= this.x + this.width  &&
-    y >= this.y && y <= this.y + this.width;
+  setIsFaceUp(isFaceUp) {
+    console.log(frameCount, "Changing value of isFaceUp, current value is: ", this.isFaceUp)
+    this.isFaceUp = isFaceUp
+    console.log(frameCount, "Changing value of isFaceUp, new value is: ", this.isFaceUp)
+  }
+
+  isUnderMouse(x, y) {
+    return x >= this.x && x <= this.x + this.width  &&
+      y >= this.y && y <= this.y + this.width
+  }
 }
 
 // Game functions
@@ -55,49 +60,47 @@ function createTiles() {
   // Assign an image from the imagesDeck array to each tile
   for (let i = 0; i < numColumns; i++) {
     for (let j = 0; j < numRows; j++) {
-      tiles.push(new Tile(i * 78 + 40, j * 78 + 40, imagesDeck.pop()));
+      tiles.push(new Tile(i * 280 + 40, j * 280 + 40, imagesDeck.pop()));
     }
   }
 }
 
-function drawInitialFaceDown() {
-  for (let i = 0; i < tiles.length; i++) {
-    // Only draw the tile in each frame if it is not face up
-    if (!tiles[i].isFaceUp) {
-      tiles[i].drawFaceDown();
+function createShadows() {
+  for (let i = 0; i < numColumns; i++) {
+    for (let j = 0; j < numRows; j++) {
+      strokeWeight(0);
+      fill(209, 211, 212);
+      rect(i * 280 + 30, j * 280 + 50, 250, 250, 20);
     }
   }
 }
 
-function drawFaceDownIfNotMatched() {
-  if (delayStartFC && (frameCount - delayStartFC) > 60) {
+function updateLogic() {
+  if (delayStartFC && (frameCount - delayStartFC) > 30) {
     for (let i = 0; i < tiles.length; i++) {
-      if (!tiles[i].isMatch) {
-        tiles[i].drawFaceDown();
+      if (!tiles[i].isMatch && tiles[i].isFaceUp) {
+        tiles[i].setIsFaceUp(false)
       }
     }
     flippedTiles = [];
     delayStartFC = null;
-    noLoop();
   }
 }
 
-function loadImagesFaceUp() {
-  imagesFaceUp = [
+function loadFaceUpImages() {
+  faceUpImages = [
+    loadImage("assets/explore.png"),
+    loadImage("assets/breath_out.png"),
+    loadImage("assets/calm.png"),
+    loadImage("assets/surrender.png"),
     loadImage("assets/ted.png"),
     loadImage("assets/adele.png"),
-    loadImage("assets/kim.png"),
-    loadImage("assets/willy.png"),
-    loadImage("assets/ted.png"),
-    loadImage("assets/adele.png"),
-    loadImage("assets/kim.png"),
-    loadImage("assets/willy.png"),
   ];
 }
 
-function createimagesDeck(images) {
+function createImagesDeck(images) {
   // Push 2 copies onto imagesDeck array
-  for (let i = 0; i < imagesFaceUp.length; i++) {
+  for (let i = 0; i < faceUpImages.length; i++) {
     imagesDeck.push(images[i]);
     imagesDeck.push(images[i]);
   }
@@ -124,29 +127,33 @@ function drawScoringMessage() {
 // p5.js functions
 // --------------------------
 function setup() {
-  createCanvas(720, 400);
+  createCanvas(1352, 1352);
 
-  imageFaceDown = loadImage("../assets/imageFaceDown.png");
-  loadImagesFaceUp();
+  faceDownImage = loadImage("../assets/faceDownImage.png");
+  loadFaceUpImages();
 
-  createimagesDeck(imagesFaceUp);
+  createImagesDeck(faceUpImages);
+  createShadows();
   createTiles();
 }
 
 function draw() {
-  drawInitialFaceDown();
-  drawFaceDownIfNotMatched();
+  updateLogic()
+
+  for (let i = 0; i < tiles.length; i++) {
+    tiles[i].render()
+  }
 }
 
 function mouseClicked() {
   for (let i = 0; i < tiles.length; i++) {
     if (tiles[i].isUnderMouse(mouseX, mouseY)) {
       if (flippedTiles.length < 2 && !tiles[i].isFaceUp) {
-        tiles[i].drawFaceUp();
+        tiles[i].setIsFaceUp(true)
         flippedTiles.push(tiles[i]);
         if (flippedTiles.length === 2) {
           numTries++;
-          if (flippedTiles[0].face === flippedTiles[1].face) {
+          if (flippedTiles[0].faceUpImage === flippedTiles[1].faceUpImage) {
             flippedTiles[0].isMatch = true;
             flippedTiles[1].isMatch = true;
           }
