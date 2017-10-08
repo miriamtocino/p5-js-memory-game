@@ -4,11 +4,11 @@ When I was a child, I remember to have played "Memory" game not only in "real li
 
 This time, instead of countries flags, I chose to use the drawings I made while I was preparing for childbirth. I will be printing them as well in paper, so I can play with Kei both "offline" and "online".
 
-I decided to build the game in JavaScript (I'm brushing-up my skills with this language at the smoment) and the [p5.js](https://p5js.org) library.
+I decided to build the game in JavaScript (I'm brushing-up my skills with this language at the moment) and the [p5.js](https://p5js.org) library.
 
 Once I am done, this is what my "Memory" game will look like:
 
-// TODO
+[![](https://github.com/miriamtocino/p5-js-memory-game/blob/master/screenshot.gif?raw=true)](https://github.com/miriamtocino/p5-js-memory-game/blob/master/screenshot.gif?raw=true)
 
 "Memory" game is a good example of using computer memory to remember information, like with arrays.
 
